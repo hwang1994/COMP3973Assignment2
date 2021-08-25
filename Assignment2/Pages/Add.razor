@@ -1,0 +1,119 @@
+﻿@page "/add"
+@inject HttpClient httpClient
+@inject NavigationManager Navigation
+
+<h3>Add Student (Email Will Be Generated)</h3>
+
+@if (students != null) // Insert form
+{
+    <EditForm Model="@student" OnValidSubmit="@HandleAdd">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <InputText placeholder="First Name" id="firstName" style="text-transform: capitalize;" @bind-Value="@student.FirstName" />
+        <br />
+        <InputText placeholder="Last Name" id="lastName" @bind-Value="@student.LastName" />
+        <br />
+        <InputText placeholder="Mobile Number" id="mobileNumber" @bind-Value="@student.MobileNumber" />
+        <br />
+        <InputText placeholder="City" id="city" @bind-Value="@student.City" />
+        <br />
+        <InputText placeholder="Specialization" id="specialization" @bind-Value="@student.Specialization" />
+        <br />
+        <button type="submit">Submit</button>
+    </EditForm>
+    @code {
+        private Student student = new Student();
+        //Student s;
+
+        private async void HandleAdd()
+        {
+            student.FirstName = capitalizeFirstLetter(student.FirstName.Trim());
+            student.LastName = capitalizeFirstLetter(student.LastName.Trim());
+            student.City = capitalizeFirstLetter(student.City.Trim());
+            student.Specialization = capitalizeFirstLetter(student.Specialization.Trim());
+            student.BcitId = generateStudentId();
+
+            student.EmailAddress = generateEmail(student.FirstName, student.LastName);
+
+            string endpoint = $"{baseUrl}api/students";
+
+            await httpClient.PostAsJsonAsync(endpoint, student);
+
+            //await load();
+            Navigation.NavigateTo("/", true);
+
+        }
+    }
+}
+else
+{
+    <p><em>Not connected to API...</em></p>
+}
+
+@code {
+    Student[] students;
+    string baseUrl = "http://localhost:5000/";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await load();
+    }
+
+    protected async Task load()
+    {
+        students = await httpClient.GetFromJsonAsync<Student[]>($"{baseUrl}api/students");
+    }
+
+    protected String generateStudentId()
+    {
+        Random rnd = new Random();
+        string id = "A0" + rnd.Next(0, 10) + rnd.Next(0, 10) + rnd.Next(0, 10) + rnd.Next(0, 10) + rnd.Next(0, 10) + rnd.Next(0, 10) + rnd.Next(0, 10);
+        while (studentIdExist(id))
+        {
+            id = "A0" + rnd.Next(0, 10) + rnd.Next(0, 10) + rnd.Next(0, 10) + rnd.Next(0, 10) + rnd.Next(0, 10) + rnd.Next(0, 10) + rnd.Next(0, 10);
+        }
+        return id;
+    }
+
+    protected String generateEmail(string firstName, string lastName)
+    {
+        string email = firstName.Substring(0, 1).ToLower() + char.ToLower(lastName[0]) + lastName.Substring(1) + "@bcit.ca";
+        while (emailExist(email))
+        {
+            Random rnd = new Random();
+            int randomNumber = rnd.Next(1, 1000);
+            email = firstName.Substring(0, 1).ToLower() + char.ToLower(lastName[0]) + lastName.Substring(1)+ randomNumber + "@bcit.ca";         
+        }
+        return email;
+    }
+
+    protected bool emailExist(string email)
+    {
+        for (int i = 0; i < students.Length; i++)
+        {
+            if (students[i].EmailAddress.Equals(email))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    protected bool studentIdExist(string id)
+    {
+        for (int i = 0; i < students.Length; i++)
+        {
+            if (students[i].BcitId.Equals(id))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    protected string capitalizeFirstLetter(string input)
+    {
+        return char.ToUpper(input[0]) + input.Substring(1);
+    }
+}

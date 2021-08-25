@@ -1,0 +1,50 @@
+﻿@page "/delete/{bcitId}"
+@inject HttpClient httpClient
+@inject NavigationManager Navigation
+
+<h3>Delete</h3>
+
+@if (student != null) // Insert form
+{
+    <EditForm Model="@student" OnValidSubmit="@HandleDelete">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <button type="submit">Confirm Delete</button>
+    </EditForm>
+
+    <a class="btn btn-success btn-sm" href="/">Cancel</a>
+
+    @code {
+
+        private async void HandleDelete()
+        {
+            string endpoint = $"{baseUrl}api/students/{student.BcitId}";
+
+            await httpClient.DeleteAsync(endpoint);
+
+            Navigation.NavigateTo("/", true);
+        }
+    }
+}
+else
+{
+    <p><em>Not connected to API or Student does not exist</em></p>
+}
+
+@code {
+    [Parameter]
+    public string BcitId { get; set; }
+
+    Student student;
+    string baseUrl = "http://localhost:5000/";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await load();
+    }
+
+    protected async Task load()
+    {
+        student = await httpClient.GetFromJsonAsync<Student>($"{baseUrl}api/students/{BcitId}");
+    }
+}

@@ -1,0 +1,100 @@
+﻿@page "/edit/{bcitId}"
+@inject HttpClient httpClient
+@inject NavigationManager Navigation
+
+<h3>Edit</h3>
+
+@if (student != null && students != null) // Insert form
+{
+    <h6>Email edit/update will be based on potential first and last name edits</h6>
+    <EditForm Model="@student" OnValidSubmit="@HandleUpdate">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <InputText placeholder="First Name" id="firstName" style="text-transform: capitalize;" @bind-Value="@student.FirstName" />
+        <br />
+        <InputText placeholder="Last Name" id="lastName" @bind-Value="@student.LastName" />
+        <br />
+        <InputText placeholder="Mobile Number" id="mobileNumber" @bind-Value="@student.MobileNumber" />
+        <br />
+        <InputText placeholder="City" id="city" @bind-Value="@student.City" />
+        <br />
+        <InputText placeholder="Specialization" id="specialization" @bind-Value="@student.Specialization" />
+        <br />
+        <button type="submit">Submit Edits</button>
+    </EditForm>
+    @code {
+
+        private async void HandleUpdate()
+        {
+            int emailFormatLength=(student.FirstName.Substring(0, 1).ToLower() + char.ToLower(student.LastName[0]) + student.LastName.Substring(1)).Length;
+            if (!(student.FirstName.Substring(0, 1).ToLower() + char.ToLower(student.LastName[0]) + student.LastName.Substring(1)).Equals(student.EmailAddress.Substring(0, emailFormatLength))) {
+                student.EmailAddress = generateEmail(student.FirstName, student.LastName);
+            }
+            student.FirstName = capitalizeFirstLetter(student.FirstName.Trim());
+            student.LastName = capitalizeFirstLetter(student.LastName.Trim());
+            student.City = capitalizeFirstLetter(student.City.Trim());
+            student.Specialization = capitalizeFirstLetter(student.Specialization.Trim());
+
+            string endpoint = $"{baseUrl}api/students/{student.BcitId}";
+
+            await httpClient.PutAsJsonAsync(endpoint, student);
+
+            //await load();
+            Navigation.NavigateTo("/", true);
+        }
+    }
+}
+else
+{
+    <p><em>Not connected to API or Student does not exist</em></p>
+}
+
+@code {
+    [Parameter]
+    public string BcitId { get; set; }
+
+    Student student;
+    Student[] students;
+    string baseUrl = "http://localhost:5000/";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await load();
+    }
+
+    protected async Task load()
+    {
+        students = await httpClient.GetFromJsonAsync<Student[]>($"{baseUrl}api/students");
+        student = await httpClient.GetFromJsonAsync<Student>($"{baseUrl}api/students/{BcitId}");
+    }
+
+    protected string capitalizeFirstLetter(string input)
+    {
+        return char.ToUpper(input[0]) + input.Substring(1);
+    }
+
+    protected String generateEmail(string firstName, string lastName)
+    {
+        string email = firstName.Substring(0, 1).ToLower() + char.ToLower(lastName[0]) + lastName.Substring(1) + "@bcit.ca";
+        while (emailExist(email))
+        {
+            Random rnd = new Random();
+            int randomNumber = rnd.Next(1, 1000);
+            email = firstName.Substring(0, 1).ToLower() + char.ToLower(lastName[0]) + lastName.Substring(1)+ randomNumber + "@bcit.ca";         
+        }
+        return email;
+    }
+
+    protected bool emailExist(string email)
+    {
+        for (int i = 0; i < students.Length; i++)
+        {
+            if (students[i].EmailAddress.Equals(email))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+}

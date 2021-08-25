@@ -1,0 +1,50 @@
+﻿@page "/"
+@inject HttpClient httpClient
+
+<h1>Henry Wang's BCIT Students</h1>
+
+@if (students == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <form action="/add">
+        <button class="btn btn-success">Add Student</button>
+    </form>
+    <table class='table table-hover'>
+        <thead>
+            <tr>
+                <th>First Name</th>
+                <th>Last Name</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in students)
+            {
+            <tr>
+                <td>@item.FirstName</td>
+                <td>@item.LastName</td>
+                <td><a class="btn btn-success btn-sm" href="/edit/@item.BcitId" >Edit</a></td>
+                <td><a class="btn btn-danger btn-sm" href="/delete/@item.BcitId">Delete</a></td>
+            </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    Student[] students;
+    string baseUrl = "http://localhost:5000/";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await load();
+    }
+
+    protected async Task load()
+    {
+        students = await httpClient.GetFromJsonAsync<Student[]>($"{baseUrl}api/students");
+    }
+}
+
