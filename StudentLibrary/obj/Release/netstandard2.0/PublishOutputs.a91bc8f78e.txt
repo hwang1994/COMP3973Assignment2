@@ -1,4 +1,0 @@
-C:\Users\hwang\Documents\Assignment2\output\StudentLibrary.dll
-C:\Users\hwang\Documents\Assignment2\output\StudentLibrary.deps.json
-C:\Users\hwang\Documents\Assignment2\output\StudentLibrary.pdb
-C:\Users\hwang\Documents\Assignment2\output\System.ComponentModel.Annotations.dll

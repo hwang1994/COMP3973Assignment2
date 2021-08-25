@@ -1,9 +1,0 @@
-D:\ASP.NET\Assignment2\StudentLibrary\obj\Debug\netcoreapp3.1\StudentLibrary.csprojAssemblyReference.cache
-D:\ASP.NET\Assignment2\StudentLibrary\obj\Debug\netcoreapp3.1\StudentLibrary.AssemblyInfoInputs.cache
-D:\ASP.NET\Assignment2\StudentLibrary\obj\Debug\netcoreapp3.1\StudentLibrary.AssemblyInfo.cs
-D:\ASP.NET\Assignment2\StudentLibrary\obj\Debug\netcoreapp3.1\StudentLibrary.csproj.CoreCompileInputs.cache
-D:\ASP.NET\Assignment2\StudentLibrary\bin\Debug\netcoreapp3.1\StudentLibrary.deps.json
-D:\ASP.NET\Assignment2\StudentLibrary\bin\Debug\netcoreapp3.1\StudentLibrary.dll
-D:\ASP.NET\Assignment2\StudentLibrary\bin\Debug\netcoreapp3.1\StudentLibrary.pdb
-D:\ASP.NET\Assignment2\StudentLibrary\obj\Debug\netcoreapp3.1\StudentLibrary.dll
-D:\ASP.NET\Assignment2\StudentLibrary\obj\Debug\netcoreapp3.1\StudentLibrary.pdb
